@@ -1,0 +1,49 @@
+id: wordpress-duplicate-page
+
+info:
+  name: Duplicate Page Detection
+  author: ricardomaia
+  severity: info
+  reference:
+    - https://wordpress.org/plugins/duplicate-page/
+  metadata:
+    plugin_namespace: duplicate-page
+    wpscan: https://wpscan.com/plugin/duplicate-page
+  tags: tech,wordpress,wp-plugin,top-100,top-200
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/wp-content/plugins/duplicate-page/readme.txt"
+
+    payloads:
+      last_version: helpers/wordpress/plugins/duplicate-page.txt
+
+    extractors:
+      - type: regex
+        part: body
+        internal: true
+        name: internal_detected_version
+        group: 1
+        regex:
+          - '(?i)Stable.tag:\s?([\w.]+)'
+
+      - type: regex
+        part: body
+        name: detected_version
+        group: 1
+        regex:
+          - '(?i)Stable.tag:\s?([\w.]+)'
+
+    matchers-condition: or
+    matchers:
+      - type: dsl
+        name: "outdated_version"
+        dsl:
+          - compare_versions(internal_detected_version, concat("< ", last_version))
+
+      - type: regex
+        part: body
+        regex:
+          - '(?i)Stable.tag:\s?([\w.]+)'
+# digest: 4a0a004730450220398c845551f51e509cf92d3fbd4bcfa6e44cae06d50ef04991728b2bd27b17fc022100ee73c749a49f884c1c4dd01ed6d52c692ec94695c35ad54e443c5e31744e1cbc:922c64590222798bb761d5b6d8e72950

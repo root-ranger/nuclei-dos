@@ -1,0 +1,49 @@
+id: wordpress-wp-maintenance-mode
+
+info:
+  name: LightStart – Maintenance Mode, Coming Soon and Landing Page Builder Detection
+  author: ricardomaia
+  severity: info
+  reference:
+    - https://wordpress.org/plugins/wp-maintenance-mode/
+  metadata:
+    plugin_namespace: wp-maintenance-mode
+    wpscan: https://wpscan.com/plugin/wp-maintenance-mode
+  tags: tech,wordpress,wp-plugin,top-200
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/wp-content/plugins/wp-maintenance-mode/readme.txt"
+
+    payloads:
+      last_version: helpers/wordpress/plugins/wp-maintenance-mode.txt
+
+    extractors:
+      - type: regex
+        part: body
+        internal: true
+        name: internal_detected_version
+        group: 1
+        regex:
+          - '(?i)Stable.tag:\s?([\w.]+)'
+
+      - type: regex
+        part: body
+        name: detected_version
+        group: 1
+        regex:
+          - '(?i)Stable.tag:\s?([\w.]+)'
+
+    matchers-condition: or
+    matchers:
+      - type: dsl
+        name: "outdated_version"
+        dsl:
+          - compare_versions(internal_detected_version, concat("< ", last_version))
+
+      - type: regex
+        part: body
+        regex:
+          - '(?i)Stable.tag:\s?([\w.]+)'
+# digest: 4b0a00483046022100a7cad812ed019575fe5526cb9687c933e7878d145be9c708e94b95b5d08f5e2b022100b234ce936bfa934289dd45e180ff80402c9bf88d1e1f1e6a434931c58e3d4e72:922c64590222798bb761d5b6d8e72950

@@ -1,0 +1,49 @@
+id: wordpress-pretty-link
+
+info:
+  name: PrettyLinks – Affiliate Links, Link Branding, Link Tracking, Marketing and Stripe Payments Plugin Detection
+  author: ricardomaia
+  severity: info
+  reference:
+    - https://wordpress.org/plugins/pretty-link/
+  metadata:
+    plugin_namespace: pretty-link
+    wpscan: https://wpscan.com/plugin/pretty-link
+  tags: tech,wordpress,wp-plugin,top-200
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/wp-content/plugins/pretty-link/readme.txt"
+
+    payloads:
+      last_version: helpers/wordpress/plugins/pretty-link.txt
+
+    extractors:
+      - type: regex
+        part: body
+        internal: true
+        name: internal_detected_version
+        group: 1
+        regex:
+          - '(?i)Stable.tag:\s?([\w.]+)'
+
+      - type: regex
+        part: body
+        name: detected_version
+        group: 1
+        regex:
+          - '(?i)Stable.tag:\s?([\w.]+)'
+
+    matchers-condition: or
+    matchers:
+      - type: dsl
+        name: "outdated_version"
+        dsl:
+          - compare_versions(internal_detected_version, concat("< ", last_version))
+
+      - type: regex
+        part: body
+        regex:
+          - '(?i)Stable.tag:\s?([\w.]+)'
+# digest: 4a0a00473045022053b0e5ea333400388bd830c27a0d3b3cedcf9d52ad98330e16f5b10857a59edf022100a9eaa65d4f01429914ddeda1eb9d0603583ec40934821d7face10fd44bc86d32:922c64590222798bb761d5b6d8e72950

@@ -1,0 +1,49 @@
+id: wordpress-wp-crontrol
+
+info:
+  name: WP Crontrol Detection
+  author: ricardomaia
+  severity: info
+  reference:
+    - https://wordpress.org/plugins/wp-crontrol/
+  metadata:
+    plugin_namespace: wp-crontrol
+    wpscan: https://wpscan.com/plugin/wp-crontrol
+  tags: tech,wordpress,wp-plugin,top-200
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/wp-content/plugins/wp-crontrol/readme.txt"
+
+    payloads:
+      last_version: helpers/wordpress/plugins/wp-crontrol.txt
+
+    extractors:
+      - type: regex
+        part: body
+        internal: true
+        name: internal_detected_version
+        group: 1
+        regex:
+          - '(?i)Stable.tag:\s?([\w.]+)'
+
+      - type: regex
+        part: body
+        name: detected_version
+        group: 1
+        regex:
+          - '(?i)Stable.tag:\s?([\w.]+)'
+
+    matchers-condition: or
+    matchers:
+      - type: dsl
+        name: "outdated_version"
+        dsl:
+          - compare_versions(internal_detected_version, concat("< ", last_version))
+
+      - type: regex
+        part: body
+        regex:
+          - '(?i)Stable.tag:\s?([\w.]+)'
+# digest: 4a0a00473045022100c9b63649a84723f681e0a5ea99f09a194c34f36ef766e4161efac52e2b7874ef022033a4bb5c11e5e6401a87db3fa4b496be69826b3a903f313a9147d44586575b44:922c64590222798bb761d5b6d8e72950

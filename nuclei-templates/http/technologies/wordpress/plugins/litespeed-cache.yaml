@@ -1,0 +1,49 @@
+id: wordpress-litespeed-cache
+
+info:
+  name: LiteSpeed Cache Detection
+  author: ricardomaia
+  severity: info
+  reference:
+    - https://wordpress.org/plugins/litespeed-cache/
+  metadata:
+    plugin_namespace: litespeed-cache
+    wpscan: https://wpscan.com/plugin/litespeed-cache
+  tags: tech,wordpress,wp-plugin,top-100,top-200
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/wp-content/plugins/litespeed-cache/readme.txt"
+
+    payloads:
+      last_version: helpers/wordpress/plugins/litespeed-cache.txt
+
+    extractors:
+      - type: regex
+        part: body
+        internal: true
+        name: internal_detected_version
+        group: 1
+        regex:
+          - '(?i)Stable.tag:\s?([\w.]+)'
+
+      - type: regex
+        part: body
+        name: detected_version
+        group: 1
+        regex:
+          - '(?i)Stable.tag:\s?([\w.]+)'
+
+    matchers-condition: or
+    matchers:
+      - type: dsl
+        name: "outdated_version"
+        dsl:
+          - compare_versions(internal_detected_version, concat("< ", last_version))
+
+      - type: regex
+        part: body
+        regex:
+          - '(?i)Stable.tag:\s?([\w.]+)'
+# digest: 490a00463044022064cc3da2cef5fd5fde20f6830eb7f8f3122a868ff1ee46150b4d6d1d9456ebb102206d029e9f8fa8a7976282d90e58f0c049e746dec409ce025f75ea11f0313601d6:922c64590222798bb761d5b6d8e72950

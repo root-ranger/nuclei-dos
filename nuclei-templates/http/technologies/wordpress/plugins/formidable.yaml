@@ -1,0 +1,49 @@
+id: wordpress-formidable
+
+info:
+  name: Formidable Forms – Contact Form Plugin, Survey, Quiz, Payment, Calculator Form & Custom Form Builder Detection
+  author: ricardomaia
+  severity: info
+  reference:
+    - https://wordpress.org/plugins/formidable/
+  metadata:
+    plugin_namespace: formidable
+    wpscan: https://wpscan.com/plugin/formidable
+  tags: tech,wordpress,wp-plugin,top-200
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/wp-content/plugins/formidable/readme.txt"
+
+    payloads:
+      last_version: helpers/wordpress/plugins/formidable.txt
+
+    extractors:
+      - type: regex
+        part: body
+        internal: true
+        name: internal_detected_version
+        group: 1
+        regex:
+          - '(?i)Stable.tag:\s?([\w.]+)'
+
+      - type: regex
+        part: body
+        name: detected_version
+        group: 1
+        regex:
+          - '(?i)Stable.tag:\s?([\w.]+)'
+
+    matchers-condition: or
+    matchers:
+      - type: dsl
+        name: "outdated_version"
+        dsl:
+          - compare_versions(internal_detected_version, concat("< ", last_version))
+
+      - type: regex
+        part: body
+        regex:
+          - '(?i)Stable.tag:\s?([\w.]+)'
+# digest: 4b0a00483046022100f556fc68e2eff5f19cd1fd79296398ff062bebffe4a80b7e56adfd4bae6d496d022100a4b340601dced50936b4225c8ca6dd7a1ee97412a7b818a577c37bc55bc0d089:922c64590222798bb761d5b6d8e72950

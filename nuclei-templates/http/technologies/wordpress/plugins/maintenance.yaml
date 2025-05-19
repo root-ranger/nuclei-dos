@@ -1,0 +1,49 @@
+id: wordpress-maintenance
+
+info:
+  name: Maintenance Detection
+  author: ricardomaia
+  severity: info
+  reference:
+    - https://wordpress.org/plugins/maintenance/
+  metadata:
+    plugin_namespace: maintenance
+    wpscan: https://wpscan.com/plugin/maintenance
+  tags: tech,wordpress,wp-plugin,top-100,top-200
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/wp-content/plugins/maintenance/readme.txt"
+
+    payloads:
+      last_version: helpers/wordpress/plugins/maintenance.txt
+
+    extractors:
+      - type: regex
+        part: body
+        internal: true
+        name: internal_detected_version
+        group: 1
+        regex:
+          - '(?i)Stable.tag:\s?([\w.]+)'
+
+      - type: regex
+        part: body
+        name: detected_version
+        group: 1
+        regex:
+          - '(?i)Stable.tag:\s?([\w.]+)'
+
+    matchers-condition: or
+    matchers:
+      - type: dsl
+        name: "outdated_version"
+        dsl:
+          - compare_versions(internal_detected_version, concat("< ", last_version))
+
+      - type: regex
+        part: body
+        regex:
+          - '(?i)Stable.tag:\s?([\w.]+)'
+# digest: 490a004630440220671667a4c4311e44a47564d59ca2476b5695adb0c435e29b21af56a458f2da9002200ebfafc3451f7eab9ffd27d2f9e7ce2f14cc95a19edf1aebafd72996cf7d7df7:922c64590222798bb761d5b6d8e72950

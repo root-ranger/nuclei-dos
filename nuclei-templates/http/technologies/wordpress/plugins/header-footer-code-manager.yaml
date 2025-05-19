@@ -1,0 +1,49 @@
+id: wordpress-header-footer-code-manager
+
+info:
+  name: Header Footer Code Manager Detection
+  author: ricardomaia
+  severity: info
+  reference:
+    - https://wordpress.org/plugins/header-footer-code-manager/
+  metadata:
+    plugin_namespace: header-footer-code-manager
+    wpscan: https://wpscan.com/plugin/header-footer-code-manager
+  tags: tech,wordpress,wp-plugin,top-200
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/wp-content/plugins/header-footer-code-manager/readme.txt"
+
+    payloads:
+      last_version: helpers/wordpress/plugins/header-footer-code-manager.txt
+
+    extractors:
+      - type: regex
+        part: body
+        internal: true
+        name: internal_detected_version
+        group: 1
+        regex:
+          - '(?i)Stable.tag:\s?([\w.]+)'
+
+      - type: regex
+        part: body
+        name: detected_version
+        group: 1
+        regex:
+          - '(?i)Stable.tag:\s?([\w.]+)'
+
+    matchers-condition: or
+    matchers:
+      - type: dsl
+        name: "outdated_version"
+        dsl:
+          - compare_versions(internal_detected_version, concat("< ", last_version))
+
+      - type: regex
+        part: body
+        regex:
+          - '(?i)Stable.tag:\s?([\w.]+)'
+# digest: 4a0a0047304502206b6c2bffcbacc7bde8b28058798763c67f385fc859668e220613369c4bf59f80022100f0d3bbd241446de2479f4963242fbca18fee51db2e68c57d2ca893df145590e2:922c64590222798bb761d5b6d8e72950

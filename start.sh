@@ -1,3 +1,5 @@
+cp -r nuclei-templates /home/runner/nuclei-templates
+
 cd nuclei
 chmod +x nuclei
 

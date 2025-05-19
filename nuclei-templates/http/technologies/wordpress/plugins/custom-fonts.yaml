@@ -1,0 +1,49 @@
+id: wordpress-custom-fonts
+
+info:
+  name: Custom Fonts – Host Your Fonts Locally Detection
+  author: ricardomaia
+  severity: info
+  reference:
+    - https://wordpress.org/plugins/custom-fonts/
+  metadata:
+    plugin_namespace: custom-fonts
+    wpscan: https://wpscan.com/plugin/custom-fonts
+  tags: tech,wordpress,wp-plugin,top-200
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/wp-content/plugins/custom-fonts/readme.txt"
+
+    payloads:
+      last_version: helpers/wordpress/plugins/custom-fonts.txt
+
+    extractors:
+      - type: regex
+        part: body
+        internal: true
+        name: internal_detected_version
+        group: 1
+        regex:
+          - '(?i)Stable.tag:\s?([\w.]+)'
+
+      - type: regex
+        part: body
+        name: detected_version
+        group: 1
+        regex:
+          - '(?i)Stable.tag:\s?([\w.]+)'
+
+    matchers-condition: or
+    matchers:
+      - type: dsl
+        name: "outdated_version"
+        dsl:
+          - compare_versions(internal_detected_version, concat("< ", last_version))
+
+      - type: regex
+        part: body
+        regex:
+          - '(?i)Stable.tag:\s?([\w.]+)'
+# digest: 4b0a00483046022100dcf1f7b60c0e1f974ed7c99816d168c84533c15119228cd9e4c82c9eaed106b1022100cb46f8b7b219ef8aea121a6fc90ffcb7cd43e4654c4cb2302eafcd6f93bff2ca:922c64590222798bb761d5b6d8e72950

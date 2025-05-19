@@ -1,0 +1,49 @@
+id: wordpress-complianz-gdpr
+
+info:
+  name: Complianz – GDPR/CCPA Cookie Consent Detection
+  author: ricardomaia
+  severity: info
+  reference:
+    - https://wordpress.org/plugins/complianz-gdpr/
+  metadata:
+    plugin_namespace: complianz-gdpr
+    wpscan: https://wpscan.com/plugin/complianz-gdpr
+  tags: tech,wordpress,wp-plugin,top-100,top-200
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/wp-content/plugins/complianz-gdpr/readme.txt"
+
+    payloads:
+      last_version: helpers/wordpress/plugins/complianz-gdpr.txt
+
+    extractors:
+      - type: regex
+        part: body
+        internal: true
+        name: internal_detected_version
+        group: 1
+        regex:
+          - '(?i)Stable.tag:\s?([\w.]+)'
+
+      - type: regex
+        part: body
+        name: detected_version
+        group: 1
+        regex:
+          - '(?i)Stable.tag:\s?([\w.]+)'
+
+    matchers-condition: or
+    matchers:
+      - type: dsl
+        name: "outdated_version"
+        dsl:
+          - compare_versions(internal_detected_version, concat("< ", last_version))
+
+      - type: regex
+        part: body
+        regex:
+          - '(?i)Stable.tag:\s?([\w.]+)'
+# digest: 4a0a00473045022100ea625388c37de62e8620182f1df1a6b9655bfae3c9d42c53f7b75ee6aad46de002207ad19d37cd3e33033131cf46934a8e8248153e4a8036a69b016c1f52f575b5e5:922c64590222798bb761d5b6d8e72950

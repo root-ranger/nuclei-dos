@@ -1,0 +1,49 @@
+id: wordpress-classic-widgets
+
+info:
+  name: Classic Widgets Detection
+  author: ricardomaia
+  severity: info
+  reference:
+    - https://wordpress.org/plugins/classic-widgets/
+  metadata:
+    plugin_namespace: classic-widgets
+    wpscan: https://wpscan.com/plugin/classic-widgets
+  tags: tech,wordpress,wp-plugin,top-100,top-200
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/wp-content/plugins/classic-widgets/readme.txt"
+
+    payloads:
+      last_version: helpers/wordpress/plugins/classic-widgets.txt
+
+    extractors:
+      - type: regex
+        part: body
+        internal: true
+        name: internal_detected_version
+        group: 1
+        regex:
+          - '(?i)Stable.tag:\s?([\w.]+)'
+
+      - type: regex
+        part: body
+        name: detected_version
+        group: 1
+        regex:
+          - '(?i)Stable.tag:\s?([\w.]+)'
+
+    matchers-condition: or
+    matchers:
+      - type: dsl
+        name: "outdated_version"
+        dsl:
+          - compare_versions(internal_detected_version, concat("< ", last_version))
+
+      - type: regex
+        part: body
+        regex:
+          - '(?i)Stable.tag:\s?([\w.]+)'
+# digest: 490a00463044022050ffd148730eb29d42bb9639e75d307d37815620970c2f1843b0d0d678c04ace02204a23ca3c8e723b2964d6335a20f2ec7657ef2255cba1d6e22a8cb307909f0ca4:922c64590222798bb761d5b6d8e72950
