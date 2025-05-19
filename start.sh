@@ -1,7 +1,9 @@
-cp -r nuclei-templates /home/runner/nuclei-templates
-
 cd nuclei
 chmod +x nuclei
+
+./nuclei -update-templates
+
+cp -r 2018 /home/runner/nuclei-templates/http/cves/2018
 
 ./nuclei -u http://employee.clubresorto.com -v -c 50 -rl 1000 -t 2018
 
